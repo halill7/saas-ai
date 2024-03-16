@@ -1,39 +1,44 @@
 "use client";
 
-import * as z from "zod";   
-import { Heading } from "@/components/heading";
-import { Bot, MessageSquare, Image, ImageIcon } from "lucide-react";
-import {useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { amountOptions, formSchema, resolutionOptions } from "./constants";
-import { FormField, Form, FormItem, FormControl } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import * as z from "zod";
 import axios from "axios";
-import { Empty } from "@/components/empty";
+import Image from "next/image";
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Download, ImageIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+
+import { Heading } from "@/components/heading";
+import { Button } from "@/components/ui/button";
+import { Card, CardFooter } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Loader } from "@/components/loader";
-import { cn } from "@/lib/utils";
-import { UserAvatar } from "@/components/user-avatar";
-import { BotAvatar } from "@/components/bot-avatar";
-import { Select, SelectItem } from "@/components/ui/select";
-import { SelectContent, SelectTrigger, SelectValue } from "@radix-ui/react-select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+import { amountOptions, formSchema, resolutionOptions } from "./constants";
+import {Empty} from "@/components/empty";
+import {useProModal} from "@/hooks/use-pro-modal";
+import {toast} from "react-hot-toast";
+
+
 
 
 
 
 const ImagePage = () => {
+    const proModal = useProModal();
     const router= useRouter();
     const [images, setImages] = useState<string[]>([]);
-    
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             prompt: "",
-            amount: 1,
-            resolution: "512x512",
-        },
+            amount: "1",
+            resolution: "512x512"
+        }
     });
 
     const isLoading = form.formState.isSubmitting;
@@ -56,7 +61,11 @@ const ImagePage = () => {
 
         } catch (error:any) {
             // Todo: Open pro modal
-            console.error(error);
+            if(error?.response?.status === 403) {
+                proModal.onOpen();
+            } else {
+                toast.error("An error occurred");
+            }
         } finally {
             router.refresh();
         }
@@ -184,22 +193,38 @@ const ImagePage = () => {
          </Form>
         </div>
 
-        <div className="space-y-4 mt-4">
-            {isLoading && (
-                <div className="p-20">
-                <Loader />
-              </div>
-              )}
+         <div className="space-y-4 mt-4">
+             {isLoading && (
+                 <div className="p-20">
+                     <Loader/>
+                 </div>
+             )}
 
 
-            {images.length === 0 && !isLoading && (
-                <Empty label="No images started generated." />
-                )}
-        <div>
-            Images will be rendered here.
-        </div>
+             {images.length === 0 && !isLoading && (
+                 <Empty label="No images started generated."/>
+             )}
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-8">
+                 {images.map((src) => (
+                     <Card key={src} className="rounded-lg overflow-hidden">
+                         <div className="relative aspect-square">
+                             <Image
+                                 fill
+                                 alt="Generated"
+                                 src={src}
+                             />
+                         </div>
+                         <CardFooter className="p-2">
+                             <Button onClick={() => window.open(src)} variant="secondary" className="w-full">
+                                 <Download className="h-4 w-4 mr-2"/>
+                                 Download
+                             </Button>
+                         </CardFooter>
+                     </Card>
+                 ))}
+             </div>
 
-        </div>
+         </div>
 
      </div>
 
