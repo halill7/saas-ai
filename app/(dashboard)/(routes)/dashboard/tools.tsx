@@ -41,6 +41,14 @@ export const tools = [
         href: "/code"
     },
 
+    {
+        label: "Data Analyse",
+        icon: Code,
+        color: "text-yellow-700",
+        bgColor: "bg-yellow-700/10",
+        href: "/data-analyse"
+    },
+
 
 
 ];
