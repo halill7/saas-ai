@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Montserrat } from "next/font/google";
 import {cn} from "@/lib/utils";
 import { LayoutDashboard, MessageSquare, ImageIcon, VideoIcon,
-Music, Code, Settings } from "lucide-react";
+Music, Code, Settings, DatabaseIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import {FreeCounter} from "@/components/free-counter";
 
@@ -51,6 +51,13 @@ const routes = [
         icon: Code,
         href: "/code",
         color:"text-green-700"
+    },
+
+    {
+        label: "Data Analyse",
+        icon: DatabaseIcon,
+        href: "/data-analyse",
+        color:"text-yellow-700"
     },
 
     {
